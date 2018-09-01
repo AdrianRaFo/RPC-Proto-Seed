@@ -1,8 +1,7 @@
-import sbt._
-import sbt.Keys._
 import freestyle.rpc.idlgen.IdlGenPlugin.autoImport._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
-import sbt.{AutoPlugin, PluginTrigger}
+import sbt.Keys._
+import sbt.{AutoPlugin, PluginTrigger, _}
 
 object ProjectPlugin extends AutoPlugin {
 
@@ -11,14 +10,12 @@ object ProjectPlugin extends AutoPlugin {
   object autoImport {
 
     lazy val V = new {
-      val fs2          = "0.10.1"
-      val log4cats     = "0.1.0"
+      val fs2            = "0.10.1"
+      val log4cats       = "0.1.0"
       val logbackClassic = "1.2.3"
-      val circe        = "0.10.0-M1"
-      val freestyleRPC = "0.14.0"
-      val http4s       = "0.18.15"
-      val pureconfig   = "0.9.1"
-      val shapeless    = "2.3.3"
+      val freestyleRPC   = "0.14.0"
+      val pureconfig     = "0.9.1"
+      val shapeless      = "2.3.3"
     }
   }
 

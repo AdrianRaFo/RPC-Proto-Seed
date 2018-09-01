@@ -6,8 +6,8 @@ import com.adrianrafo.seed.common.SeedConfig
 import fs2.{Stream, StreamApp}
 import io.chrisdavenport.log4cats.Logger
 
-import scala.language.postfixOps
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class ClientProgram[F[_]: Effect] extends ClientBoot[F] {
 
@@ -24,9 +24,12 @@ class ClientProgram[F[_]: Effect] extends ClientBoot[F] {
       implicit L: Logger[F]): Stream[F, StreamApp.ExitCode] = {
     for {
       peopleClient <- peopleServiceClient(config.host, config.port)
-      exitCode     <- peopleClient.getPersonStream("foo").map(_ => StreamApp.ExitCode.Success)
-    } yield exitCode
+      _            <- peopleClient.getRandomPersonStream
+    } yield StreamApp.ExitCode.Success
   }
 }
 
-object ClientApp extends ClientProgram[IO]
+object ClientApp extends ClientProgram[IO] {
+  def main(args: Array[String]): Unit =
+    stream.compile.drain.unsafeRunSync()
+}

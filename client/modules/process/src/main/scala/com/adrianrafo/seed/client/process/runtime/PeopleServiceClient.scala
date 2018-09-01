@@ -2,22 +2,24 @@ package com.adrianrafo.seed.client.process.runtime
 
 import cats.effect._
 import cats.syntax.applicative._
+import cats.syntax.apply._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import com.adrianrafo.seed.client.process.ClientRPC
 import com.adrianrafo.seed.protocol.people._
+import fs2._
 import io.chrisdavenport.log4cats.Logger
 import io.grpc.{CallOptions, ManagedChannel}
 import monix.execution.Scheduler
-import fs2._
 
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Random
 
 trait PeopleServiceClient[F[_]] {
 
   def getPerson(name: String): F[Person]
 
-  def getPersonStream(name: String): Stream[F, Person]
+  def getRandomPersonStream: Stream[F, Person]
 
 }
 object PeopleServiceClient {
@@ -25,6 +27,8 @@ object PeopleServiceClient {
   def apply[F[_]: Effect](clientF: F[PeopleService.Client[F]])(
       implicit L: Logger[F]): PeopleServiceClient[F] =
     new PeopleServiceClient[F] {
+
+      val serviceName = "PeopleClient"
 
       def getPerson(name: String): F[Person] =
         for {
@@ -34,13 +38,20 @@ object PeopleServiceClient {
           _      <- L.info(s"Result: $result")
         } yield result.person
 
-      def getPersonStream(name: String): Stream[F, Person] =
+      def getRandomPersonStream: Stream[F, Person] = {
+
+        def requestStream: Stream[F, PeopleRequest] =
+          Stream.iterateEval(PeopleRequest("")) { _ =>
+            val req = PeopleRequest(Random.nextPrintableChar().toString)
+            Thread.sleep(2000).pure[F] *> L.info(s"$serviceName Request: $req").as(req)
+          }
+
         for {
           client <- Stream.eval(clientF)
-          _      <- Stream.eval(L.info(s"Request: $name"))
-          result <- client.getPersonStream(PeopleRequest(name))
-          _      <- Stream.eval(L.info(s"Result: $result"))
+          result <- client.getPersonStream(requestStream)
+          _      <- Stream.eval(L.info(s"$serviceName Result: $result"))
         } yield result.person
+      }
 
     }
 

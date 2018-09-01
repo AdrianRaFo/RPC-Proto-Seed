@@ -18,7 +18,7 @@ object people {
   trait PeopleService[F[_]] {
 
     def getPerson(request: PeopleRequest): F[PeopleResponse]
-    def getPersonStream(request: PeopleRequest): Stream[F, PeopleResponse]
+    def getPersonStream(request: Stream[F, PeopleRequest]): Stream[F, PeopleResponse]
 
   }
 

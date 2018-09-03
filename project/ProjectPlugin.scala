@@ -1,7 +1,7 @@
 import freestyle.rpc.idlgen.IdlGenPlugin.autoImport._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
 import sbt.Keys._
-import sbt.{AutoPlugin, PluginTrigger, _}
+import sbt._
 
 object ProjectPlugin extends AutoPlugin {
 

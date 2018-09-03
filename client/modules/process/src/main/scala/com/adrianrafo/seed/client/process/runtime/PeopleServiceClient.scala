@@ -25,7 +25,8 @@ trait PeopleServiceClient[F[_]] {
 object PeopleServiceClient {
 
   def apply[F[_]](clientF: F[PeopleService.Client[F]])(
-      implicit F : Effect[F], L: Logger[F]): PeopleServiceClient[F] =
+      implicit F: Effect[F],
+      L: Logger[F]): PeopleServiceClient[F] =
     new PeopleServiceClient[F] {
 
       val serviceName = "PeopleClient"

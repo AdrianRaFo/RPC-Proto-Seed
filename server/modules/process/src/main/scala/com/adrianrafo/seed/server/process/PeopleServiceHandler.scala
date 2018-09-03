@@ -1,14 +1,13 @@
 package com.adrianrafo.seed.server.process
 
 import cats.effect.Sync
-import cats.syntax.applicative._
 import cats.syntax.apply._
 import cats.syntax.functor._
 import com.adrianrafo.seed.protocol.people._
 import fs2._
 import io.chrisdavenport.log4cats.Logger
 
-class PeopleServiceHandler[F[_]](implicit F : Sync[F], L: Logger[F]) extends PeopleService[F] {
+class PeopleServiceHandler[F[_]](implicit F: Sync[F], L: Logger[F]) extends PeopleService[F] {
 
   val serviceName = "PeopleService"
 

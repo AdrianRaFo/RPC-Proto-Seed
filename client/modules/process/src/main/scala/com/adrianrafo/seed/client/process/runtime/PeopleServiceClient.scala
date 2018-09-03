@@ -24,8 +24,8 @@ trait PeopleServiceClient[F[_]] {
 }
 object PeopleServiceClient {
 
-  def apply[F[_]: Effect](clientF: F[PeopleService.Client[F]])(
-      implicit L: Logger[F]): PeopleServiceClient[F] =
+  def apply[F[_]](clientF: F[PeopleService.Client[F]])(
+      implicit F : Effect[F], L: Logger[F]): PeopleServiceClient[F] =
     new PeopleServiceClient[F] {
 
       val serviceName = "PeopleClient"
@@ -43,7 +43,7 @@ object PeopleServiceClient {
         def requestStream: Stream[F, PeopleRequest] =
           Stream.iterateEval(PeopleRequest("")) { _ =>
             val req = PeopleRequest(Random.nextPrintableChar().toString)
-            Thread.sleep(2000).pure[F] *> L.info(s"$serviceName Request: $req").as(req)
+            F.delay(Thread.sleep(2000)) *> L.info(s"$serviceName Request: $req").as(req)
           }
 
         for {

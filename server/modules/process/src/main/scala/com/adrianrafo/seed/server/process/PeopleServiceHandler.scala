@@ -8,7 +8,7 @@ import com.adrianrafo.seed.protocol.people._
 import fs2._
 import io.chrisdavenport.log4cats.Logger
 
-class PeopleServiceHandler[F[_]: Sync](implicit L: Logger[F]) extends PeopleService[F] {
+class PeopleServiceHandler[F[_]](implicit F : Sync[F], L: Logger[F]) extends PeopleService[F] {
 
   val serviceName = "PeopleService"
 
@@ -19,7 +19,7 @@ class PeopleServiceHandler[F[_]: Sync](implicit L: Logger[F]) extends PeopleServ
 
     def responseF(person: PeopleRequest): F[PeopleResponse] = {
       val response = PeopleResponse(Person(person.name, 10))
-      Thread.sleep(2000).pure[F] *> L.info(s"$serviceName - Response: $response").as(response)
+      F.delay(Thread.sleep(2000)) *> L.info(s"$serviceName - Response: $response").as(response)
     }
 
     for {

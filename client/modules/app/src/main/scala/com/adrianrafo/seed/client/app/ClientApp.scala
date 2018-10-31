@@ -29,7 +29,4 @@ class ClientProgram[F[_]: Effect] extends ClientBoot[F] {
   }
 }
 
-object ClientApp extends ClientProgram[IO] {
-  def main(args: Array[String]): Unit =
-    stream.compile.drain.unsafeRunSync()
-}
+object ClientApp extends ClientProgram[IO]

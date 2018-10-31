@@ -14,7 +14,9 @@ abstract class ClientBoot[F[_]: Effect] extends StreamApp[F] {
 
   implicit val TM: Timer[F] = Timer.derive[F](Effect[F], IO.timer(S))
 
-  override def stream(args: List[String], requestShutdown: F[Unit]): Stream[F, StreamApp.ExitCode] = {
+  override def stream(
+      args: List[String],
+      requestShutdown: F[Unit]): Stream[F, StreamApp.ExitCode] = {
 
     def mainStream: Stream[F, StreamApp.ExitCode] =
       for {
@@ -23,7 +25,9 @@ abstract class ClientBoot[F[_]: Effect] extends StreamApp[F] {
         exitCode <- serverStream(config)(logger)
       } yield exitCode
 
-    mainStream.drain.handleErrorWith(e => Stream.emit(StreamApp.ExitCode.Error)) ++ Stream.emit(
+    mainStream.drain
+      .covaryOutput[StreamApp.ExitCode]
+      .handleErrorWith(e => Stream.emit(StreamApp.ExitCode.Error)) ++ Stream.emit(
       StreamApp.ExitCode.Success)
   }
 

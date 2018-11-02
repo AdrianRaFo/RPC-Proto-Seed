@@ -1,7 +1,7 @@
 package com.adrianrafo.seed.protocol
 
 import fs2._
-import freestyle.rpc.protocol._
+import mu.rpc.protocol._
 
 object people {
 

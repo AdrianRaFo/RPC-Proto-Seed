@@ -18,12 +18,14 @@ class PeopleServiceHandler[F[_]](implicit F: Sync[F], L: Logger[F]) extends Peop
 
     def responseF(person: PeopleRequest): F[PeopleResponse] = {
       val response = PeopleResponse(Person(person.name, 10))
-      F.delay(Thread.sleep(2000)) *> L.info(s"$serviceName - Response: $response").as(response)
+      F.delay(Thread.sleep(2000)) *> L
+        .info(s"$serviceName - Stream Response: $response")
+        .as(response)
     }
 
     for {
       person   <- request
-      _        <- Stream.eval(L.info(s"$serviceName - Request: $person"))
+      _        <- Stream.eval(L.info(s"$serviceName - Stream Request: $person"))
       response <- Stream.eval(responseF(person))
     } yield response
   }

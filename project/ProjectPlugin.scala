@@ -1,4 +1,4 @@
-import mu.rpc.idlgen.IdlGenPlugin.autoImport._
+import higherkindness.mu.rpc.idlgen.IdlGenPlugin.autoImport._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -9,12 +9,14 @@ object ProjectPlugin extends AutoPlugin {
 
   object autoImport {
 
+    //noinspection TypeAnnotation
     lazy val V = new {
-      val fs2            = "0.10.1"
-      val log4cats       = "0.1.0"
+      val catsEffect     = "1.2.0"
+      val log4cats       = "0.3.0"
       val logbackClassic = "1.2.3"
-      val muRPC          = "0.16.0"
-      val pureconfig     = "0.9.1"
+      val muRPC          = "0.17.2"
+      val scopt          = "3.7.0"
+      val pureconfig     = "0.10.2"
       val shapeless      = "2.3.3"
     }
   }
@@ -30,26 +32,29 @@ object ProjectPlugin extends AutoPlugin {
 
   lazy val configSettings: Seq[Def.Setting[_]] = Seq(
     libraryDependencies ++= Seq(
-      "co.fs2"                %% "fs2-core"   % V.fs2,
-      "com.github.pureconfig" %% "pureconfig" % V.pureconfig))
+      "org.typelevel"         %% "cats-effect" % V.catsEffect,
+      "com.github.pureconfig" %% "pureconfig"  % V.pureconfig))
 
-  lazy val rpcProtocolSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val serverProtocolSettings: Seq[Def.Setting[_]] = Seq(
     idlType := "proto",
     libraryDependencies ++= Seq(
-      "io.higherkindness" %% "mu-rpc-client-core" % V.muRPC
+      "io.higherkindness" %% "mu-rpc-fs2" % V.muRPC
     )
   )
 
   lazy val clientRPCSettings: Seq[Def.Setting[_]] = logSettings ++ Seq(
     libraryDependencies ++= Seq(
-      "io.higherkindness" %% "mu-rpc-client-netty" % V.muRPC,
-      "io.higherkindness" %% "mu-rpc-client-cache" % V.muRPC
+      "io.higherkindness" %% "mu-rpc-netty" % V.muRPC,
+      "io.higherkindness" %% "mu-rpc-fs2"   % V.muRPC
     )
   )
 
-  lazy val clientAppSettings: Seq[Def.Setting[_]] = logSettings
+  lazy val clientAppSettings: Seq[Def.Setting[_]] = Seq(
+    libraryDependencies ++= Seq(
+      "com.github.scopt" %% "scopt" % V.scopt
+    ))
 
-  lazy val serverSettings: Seq[Def.Setting[_]] = logSettings ++ Seq(libraryDependencies ++= Seq())
+  lazy val serverProcessSettings: Seq[Def.Setting[_]] = logSettings
 
   lazy val serverAppSettings: Seq[Def.Setting[_]] = logSettings ++ Seq(
     libraryDependencies ++= Seq("io.higherkindness" %% "mu-rpc-server" % V.muRPC))
@@ -76,7 +81,6 @@ object ProjectPlugin extends AutoPlugin {
         "-Ywarn-unused-import"
       ),
       scalafmtCheck := true,
-      scalafmtOnCompile := true,
       addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     )
 }

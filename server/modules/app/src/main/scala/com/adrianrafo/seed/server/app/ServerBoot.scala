@@ -1,23 +1,22 @@
 package com.adrianrafo.seed.server.app
 
-import cats.effect.Effect
-import com.adrianrafo.seed.common.SeedConfig
+import cats.effect._
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import com.adrianrafo.seed.config.ConfigService
+import com.adrianrafo.seed.server.common.models._
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
-import fs2._
-import monix.execution.Scheduler
+import pureconfig.generic.auto._
 
-abstract class ServerBoot[F[_]: Effect] extends StreamApp[F] {
+abstract class ServerBoot[F[_]: ConcurrentEffect] {
 
-  implicit val S: Scheduler = monix.execution.Scheduler.Implicits.global
-
-  override def stream(args: List[String], requestShutdown: F[Unit]): Stream[F, StreamApp.ExitCode] =
+  def runProgram(args: List[String]): F[ExitCode] =
     for {
-      config   <- ConfigService[F].serviceConfig[SeedConfig]
-      logger   <- Stream.eval(Slf4jLogger.fromName[F](config.name))
-      exitCode <- serverStream(config)(logger)
+      config   <- ConfigService[F].serviceConfig[SeedServerConfig]
+      logger   <- Slf4jLogger.fromName[F](config.server.name)
+      exitCode <- serverProgram(config.server)(logger)
     } yield exitCode
 
-  def serverStream(config: SeedConfig)(implicit L: Logger[F]): Stream[F, StreamApp.ExitCode]
+  def serverProgram(config: ServerConfig)(implicit L: Logger[F]): F[ExitCode]
 }

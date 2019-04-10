@@ -1,36 +1,42 @@
 package com.adrianrafo.seed.client.app
 
 import cats.effect._
-import com.adrianrafo.seed.common.SeedConfig
+import cats.syntax.functor._
+import com.adrianrafo.seed.client.common.models.{ClientConfig, SeedClientConfig}
+import com.adrianrafo.seed.client.process.runtime.PeopleServiceClient
 import com.adrianrafo.seed.config.ConfigService
-import fs2.{Stream, StreamApp}
+import fs2.Stream
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
-import monix.execution.Scheduler
+import pureconfig.generic.auto._
 
-abstract class ClientBoot[F[_]: Effect] extends StreamApp[F] {
+import scala.concurrent.ExecutionContext
 
-  implicit val S: Scheduler = monix.execution.Scheduler.Implicits.global
+abstract class ClientBoot[F[_]: ConcurrentEffect] {
 
-  implicit val TM: Timer[F] = Timer.derive[F](Effect[F], IO.timer(S))
+  def peopleServiceClient(host: String, port: Int)(
+      implicit L: Logger[F],
+      EC: ExecutionContext): Stream[F, PeopleServiceClient[F]] =
+    PeopleServiceClient.createClient(host, port, sslEnabled = false)
 
-  override def stream(
-      args: List[String],
-      requestShutdown: F[Unit]): Stream[F, StreamApp.ExitCode] = {
+  def runProgram(args: List[String]): Stream[F, ExitCode] = {
+    def setupConfig: F[SeedClientConfig] =
+      ConfigService[F]
+        .serviceConfig[ClientConfig]
+        .map(client => SeedClientConfig(client, ClientParams.loadParams(client.name, args)))
 
-    def mainStream: Stream[F, StreamApp.ExitCode] =
+    def mainStream: Stream[F, ExitCode] =
       for {
-        config   <- ConfigService[F].serviceConfig[SeedConfig]
-        logger   <- Stream.eval(Slf4jLogger.fromName[F](config.name))
-        exitCode <- serverStream(config)(logger)
+        config   <- Stream.eval(setupConfig)
+        logger   <- Stream.eval(Slf4jLogger.fromName[F](config.client.name))
+        exitCode <- clientProgram(config)(logger)
       } yield exitCode
 
     mainStream.drain
-      .covaryOutput[StreamApp.ExitCode]
-      .handleErrorWith(e => Stream.emit(StreamApp.ExitCode.Error)) ++ Stream.emit(
-      StreamApp.ExitCode.Success)
+      .covaryOutput[ExitCode]
+      .handleErrorWith(e => Stream.emit(ExitCode.Error)) ++ Stream.emit(ExitCode.Success)
   }
 
-  def serverStream(config: SeedConfig)(implicit L: Logger[F]): Stream[F, StreamApp.ExitCode]
+  def clientProgram(config: SeedClientConfig)(implicit L: Logger[F]): Stream[F, ExitCode]
 
 }

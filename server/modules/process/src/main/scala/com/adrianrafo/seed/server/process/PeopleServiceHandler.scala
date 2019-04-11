@@ -3,7 +3,8 @@ package com.adrianrafo.seed.server.process
 import cats.effect.Sync
 import cats.syntax.apply._
 import cats.syntax.functor._
-import com.adrianrafo.seed.protocol.people._
+import com.adrianrafo.seed.server.protocol.people._
+import com.adrianrafo.seed.server.protocol.services.PeopleService
 import fs2._
 import io.chrisdavenport.log4cats.Logger
 

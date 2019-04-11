@@ -37,6 +37,8 @@ object ProjectPlugin extends AutoPlugin {
 
   lazy val serverProtocolSettings: Seq[Def.Setting[_]] = Seq(
     idlType := "proto",
+    srcGenSerializationType := "Protobuf",
+    sourceGenerators in Compile += (srcGen in Compile).taskValue,
     libraryDependencies ++= Seq(
       "io.higherkindness" %% "mu-rpc-fs2" % V.muRPC
     )
@@ -44,8 +46,7 @@ object ProjectPlugin extends AutoPlugin {
 
   lazy val clientRPCSettings: Seq[Def.Setting[_]] = logSettings ++ Seq(
     libraryDependencies ++= Seq(
-      "io.higherkindness" %% "mu-rpc-netty" % V.muRPC,
-      "io.higherkindness" %% "mu-rpc-fs2"   % V.muRPC
+      "io.higherkindness" %% "mu-rpc-netty" % V.muRPC
     )
   )
 

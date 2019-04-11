@@ -6,7 +6,8 @@ import cats.effect._
 import cats.syntax.apply._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
-import com.adrianrafo.seed.protocol.people._
+import com.adrianrafo.seed.server.protocol.people._
+import com.adrianrafo.seed.server.protocol.services._
 import fs2._
 import higherkindness.mu.rpc.ChannelForAddress
 import higherkindness.mu.rpc.channel.{ManagedChannelInterpreter, UsePlaintext}

@@ -3,9 +3,9 @@ package com.adrianrafo.seed.server.app
 import cats.effect._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
-import com.adrianrafo.seed.protocol.people._
 import com.adrianrafo.seed.server.common.models._
 import com.adrianrafo.seed.server.process.PeopleServiceHandler
+import com.adrianrafo.seed.server.protocol.services._
 import higherkindness.mu.rpc.server.{AddService, GrpcServer}
 import io.chrisdavenport.log4cats.Logger
 

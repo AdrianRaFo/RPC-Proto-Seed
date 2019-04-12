@@ -1,4 +1,4 @@
-package com.adrianrafo.seed.client.process.runtime
+package com.adrianrafo.seed.client.process
 
 import java.net.InetAddress
 

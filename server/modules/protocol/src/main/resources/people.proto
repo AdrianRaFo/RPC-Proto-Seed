@@ -7,14 +7,6 @@ message Person {
   required int32 age = 2;
 }
 
-message NotFoundError {
-  required string message = 1;
-}
-
-message DuplicatedPersonError {
-  required string message = 1;
-}
-
 message PeopleRequest {
   required string name = 1;
 }

@@ -10,7 +10,7 @@ import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 import pureconfig.generic.auto._
 
-abstract class ClientBoot[F[_]: ConcurrentEffect: ContextShift] {
+abstract class ClientBoot[F[_]: ConcurrentEffect: ContextShift: Timer] {
 
   def peopleServiceClient(host: String, port: Int)(
       implicit L: Logger[F]): Stream[F, PeopleServiceClient[F]] =

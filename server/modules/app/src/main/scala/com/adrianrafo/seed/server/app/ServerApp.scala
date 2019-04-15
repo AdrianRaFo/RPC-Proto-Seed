@@ -9,7 +9,7 @@ import com.adrianrafo.seed.server.protocol.services._
 import higherkindness.mu.rpc.server.{AddService, GrpcServer}
 import io.chrisdavenport.log4cats.Logger
 
-class ServerProgram[F[_]: ConcurrentEffect] extends ServerBoot[F] {
+class ServerProgram[F[_]: ConcurrentEffect: Timer] extends ServerBoot[F] {
 
   def serverProgram(config: SeedServerConfig)(implicit L: Logger[F]): F[ExitCode] = {
 

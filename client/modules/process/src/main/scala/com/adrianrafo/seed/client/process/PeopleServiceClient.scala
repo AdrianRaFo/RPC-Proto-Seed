@@ -15,6 +15,7 @@ import io.chrisdavenport.log4cats.Logger
 import io.grpc.{CallOptions, ManagedChannel}
 
 import scala.util.Random
+import scala.concurrent.duration._
 
 trait PeopleServiceClient[F[_]] {
 
@@ -25,8 +26,10 @@ trait PeopleServiceClient[F[_]] {
 }
 object PeopleServiceClient {
 
-  def apply[F[_]](
-      client: PeopleService[F])(implicit F: Effect[F], L: Logger[F]): PeopleServiceClient[F] =
+  def apply[F[_]](client: PeopleService[F])(
+      implicit F: Effect[F],
+      L: Logger[F],
+      T: Timer[F]): PeopleServiceClient[F] =
     new PeopleServiceClient[F] {
 
       val serviceName = "PeopleClient"
@@ -42,7 +45,7 @@ object PeopleServiceClient {
         def requestStream: Stream[F, PeopleRequest] =
           Stream.iterateEval(PeopleRequest("")) { _ =>
             val req = PeopleRequest(Random.nextPrintableChar().toString)
-            F.delay(Thread.sleep(2000)) *> L.info(s"$serviceName Stream Request: $req").as(req)
+            T.sleep(2.seconds) *> L.info(s"$serviceName Stream Request: $req").as(req)
           }
 
         for {
@@ -53,7 +56,7 @@ object PeopleServiceClient {
 
     }
 
-  def createClient[F[_]: ContextShift: Logger](
+  def createClient[F[_]: ContextShift: Logger: Timer](
       hostname: String,
       port: Int,
       sslEnabled: Boolean = true)(

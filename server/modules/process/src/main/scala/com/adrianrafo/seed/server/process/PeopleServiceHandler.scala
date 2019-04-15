@@ -1,6 +1,6 @@
 package com.adrianrafo.seed.server.process
 
-import cats.effect.Sync
+import cats.effect.{Sync, Timer}
 import cats.syntax.apply._
 import cats.syntax.functor._
 import com.adrianrafo.seed.server.protocol.people._
@@ -8,7 +8,9 @@ import com.adrianrafo.seed.server.protocol.services.PeopleService
 import fs2._
 import io.chrisdavenport.log4cats.Logger
 
-class PeopleServiceHandler[F[_]](implicit F: Sync[F], L: Logger[F]) extends PeopleService[F] {
+import scala.concurrent.duration._
+
+class PeopleServiceHandler[F[_]:Timer](implicit F: Sync[F], L: Logger[F]) extends PeopleService[F] {
 
   val serviceName = "PeopleService"
 
@@ -17,17 +19,17 @@ class PeopleServiceHandler[F[_]](implicit F: Sync[F], L: Logger[F]) extends Peop
 
   def getPersonStream(request: Stream[F, PeopleRequest]): Stream[F, PeopleResponse] = {
 
-    def responseF(person: PeopleRequest): F[PeopleResponse] = {
+    def responseStream(person: PeopleRequest): Stream[F, PeopleResponse] = {
       val response = PeopleResponse(Person(person.name, 10))
-      F.delay(Thread.sleep(2000)) *> L
-        .info(s"$serviceName - Stream Response: $response")
-        .as(response)
+      Stream.awakeEvery[F](2.seconds).evalMap(_ => L
+          .info(s"$serviceName - Stream Response: $response")
+          .as(response))
     }
 
     for {
       person   <- request
       _        <- Stream.eval(L.info(s"$serviceName - Stream Request: $person"))
-      response <- Stream.eval(responseF(person))
+      response <- responseStream(person)
     } yield response
   }
 

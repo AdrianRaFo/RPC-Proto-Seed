@@ -5,7 +5,7 @@ import com.adrianrafo.seed.client.common.models._
 import fs2.Stream
 import io.chrisdavenport.log4cats.Logger
 
-class ClientProgram[F[_]: ConcurrentEffect: ContextShift] extends ClientBoot[F] {
+class ClientProgram[F[_]: ConcurrentEffect: ContextShift: Timer] extends ClientBoot[F] {
 
   def clientProgram(config: SeedClientConfig)(implicit L: Logger[F]): Stream[F, ExitCode] = {
     for {

@@ -33,7 +33,6 @@ object PeopleServiceClient {
 
       def getPerson(name: String): F[Person] =
         for {
-          _      <- L.info(s"")
           result <- client.getPerson(PeopleRequest(name))
           _      <- L.info(s"$serviceName - Request: $name - Result: $result")
         } yield result.person

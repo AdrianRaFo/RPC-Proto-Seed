@@ -27,7 +27,9 @@ lazy val server_common = project in file("server/modules/common")
 
 lazy val server_protocol = project in file("server/modules/protocol") settings serverProtocolSettings
 
-lazy val server_process = project in file("server/modules/process") settings serverProcessSettings dependsOn (server_common, server_protocol)
+lazy val server_protocol_services = project in file("server/modules/protocol_services") settings serverProtocolServicesSettings dependsOn server_protocol
+
+lazy val server_process = project in file("server/modules/process") settings serverProcessSettings dependsOn (server_common, server_protocol_services)
 
 lazy val server_app = project in file("server/modules/app") settings serverAppSettings dependsOn (server_process, config)
 
@@ -38,6 +40,7 @@ lazy val server_app = project in file("server/modules/app") settings serverAppSe
 lazy val allServerModules: Seq[ProjectReference] = Seq(
   server_common,
   server_protocol,
+  server_protocol_services,
   server_process,
   server_app
 )
@@ -54,7 +57,7 @@ addCommandAlias("runServer", "server_app/runMain com.adrianrafo.seed.server.app.
 
 lazy val client_common = project in file("client/modules/common")
 
-lazy val client_process = project in file("client/modules/process") settings clientRPCSettings dependsOn (client_common, server_protocol)
+lazy val client_process = project in file("client/modules/process") settings clientRPCSettings dependsOn (client_common, server_protocol_services)
 
 lazy val client_app = project in file("client/modules/app") settings clientAppSettings dependsOn (client_process, config)
 

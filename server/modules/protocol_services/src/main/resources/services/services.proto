@@ -6,7 +6,7 @@ import "shared/people.proto";
 
 service PeopleService {
 
-  rpc getPerson (com.adrianrafo.seed.server.protocol.shared.PeopleRequest) returns (com.adrianrafo.seed.server.protocol.shared.PeopleResponse);
-  rpc getPersonStream (stream com.adrianrafo.seed.server.protocol.shared.PeopleRequest) returns (stream com.adrianrafo.seed.server.protocol.shared.PeopleResponse);
+  rpc getPerson (com.adrianrafo.seed.server.protocol.PeopleRequest) returns (com.adrianrafo.seed.server.protocol.PeopleResponse);
+  rpc getPersonStream (stream com.adrianrafo.seed.server.protocol.PeopleRequest) returns (stream com.adrianrafo.seed.server.protocol.PeopleResponse);
 
 }

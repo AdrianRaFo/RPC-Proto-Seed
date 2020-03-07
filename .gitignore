@@ -14,3 +14,7 @@ project/plugins/project/
 ### IntelliJ
 .idea
 gen
+
+### Metals
+.metals
+.bloop

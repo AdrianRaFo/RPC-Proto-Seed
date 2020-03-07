@@ -62,7 +62,7 @@ object ProjectPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       organizationName := "AdrianRaFo",
-      scalaVersion := "2.12.6",
+      scalaVersion := "2.12.10",
       scalacOptions := Seq(
         "-deprecation",
         "-encoding",
